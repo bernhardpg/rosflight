@@ -13,6 +13,7 @@ namespace controller
       Controller(ros::NodeHandle *nh);
     private:
       ros::NodeHandle _nh;
+
       ros::Subscriber _odom_subscriber;
       ros::Publisher _command_publisher;
 

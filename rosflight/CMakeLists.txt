@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   std_srvs
   tf
+  nav_msgs # TODO Remove this
 )
 find_package(Boost REQUIRED COMPONENTS system thread)
 find_package(Eigen3 REQUIRED)
@@ -94,6 +95,13 @@ target_link_libraries(calibrate_mag
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
 )
+
+# TODO Find a better name
+add_executable(norobo_controller
+  src/controller/controller.cpp
+)
+target_link_libraries(norobo_controller ${catkin_LIBRARIES})
+add_dependencies(norobo_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 #############
 ## Install ##

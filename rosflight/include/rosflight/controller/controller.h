@@ -7,6 +7,26 @@
 
 namespace controller
 {
+  typedef struct
+  {
+    // Position
+    double pn; // N
+    double pe; // E
+    double pd; // D
+
+    double x_dot;
+    double y_dot;
+    double z_dot;
+  } state_t;
+
+ typedef struct
+  {
+    double x;
+    double y;
+    double z;
+    double F;
+  } input_t;
+
   class Controller
   {
     public:
@@ -18,6 +38,16 @@ namespace controller
       ros::Publisher _command_publisher;
 
       void odomCallback(const nav_msgs::OdometryConstPtr &msg);
+      void computeControl();
+      void publishCommand();
+
+      state_t _x; // TODO change to estimate
+      state_t _x_ref;
+      input_t _u;
+      double _eq_thrust;
+
+      double _kp;
+      double _kd;
   };
 }
 

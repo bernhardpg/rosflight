@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include "rosflight_msgs/Command.h"
 #include <nav_msgs/Odometry.h>
+#include <cmath>
 
 namespace controller
 {
@@ -14,18 +15,40 @@ namespace controller
     double pe; // E
     double pd; // D
 
-    double x_dot;
-    double y_dot;
-    double z_dot;
+    double vn;
+    double ve;
+    double vd;
+
+    // Using yaw-pitch-roll Euler angles
+    double phi; // roll
+    double theta; // pitch
+    double psi; // yaw
   } state_t;
 
  typedef struct
   {
+    // Actual inputs to attitude controller
     double x;
     double y;
     double z;
     double F;
+
+    // Virtual inputs
+    double n;
+    double e;
+    double d;
   } input_t;
+
+ typedef struct
+ {
+  double pn;
+  double pe;
+  double pd;
+
+  double dn;
+  double de;
+  double dd;
+ } gain_t;
 
   class Controller
   {
@@ -41,13 +64,15 @@ namespace controller
       void computeControl();
       void publishCommand();
 
+      double saturate(double v); // TODO move somewhere else
+
       state_t _x; // TODO change to estimate
       state_t _x_ref;
       input_t _u;
-      double _eq_thrust;
+      gain_t _k;
 
-      double _kp;
-      double _kd;
+      double _eq_thrust;
+      double _max_thrust;
   };
 }
 

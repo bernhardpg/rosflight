@@ -47,6 +47,8 @@ namespace controller
   double dn;
   double de;
   double dd;
+
+  double ppsi;
  } gain_t;
 
   class Controller

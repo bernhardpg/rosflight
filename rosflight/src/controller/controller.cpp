@@ -9,18 +9,17 @@ namespace controller {
     // Model parameters
     _m = 2.0; // kg
     _g = 9.8; // m/s**2
+    _max_thrust = 14.961 * 4; // From gazebo sim, 4 rotors
 
-    // P gains
+    // Controller gains
     _k.pn = 2.0;
     _k.pe = 2.0;
     _k.pd = 14;
-
-    // D gains
     _k.dn = 3.5;
     _k.de = 3.5;
     _k.dd = 7.0;
-    _eq_thrust = 0.542;
-    _max_thrust = 14.961 * 4; // From gazebo sim, 4 rotors
+    _k.ppsi = 1.0;
+
     _u = {0, 0, 0, 0};
 
     _odom_subscriber = _nh.subscribe("/multirotor/truth/NED", 1000,
@@ -90,7 +89,10 @@ namespace controller {
         / ((_g - _u.d) * (cos(_x.psi) + tan(_x.psi) * sin(_x.psi)))
         );
 
-    // TODO something off when yaw is changed
+    // TODO yaw problem: oscillates like crazy for psi = pi/2
+    // singularity maybe?
+    
+    _u.psi = -_k.ppsi * _x.psi; // TODO only P controller so far
 
     ROS_INFO("un: %f, ue: %f, u_phi: %f, u_theta: %f",
         _u.n, _u.e, _u.phi, _u.theta);
@@ -116,7 +118,7 @@ namespace controller {
     _command.F = saturate(_u.F / _max_thrust, 0.0, 1.0);
     _command.x = saturate(_u.phi, -_max_tilt, _max_tilt);
     _command.y = saturate(_u.theta, -_max_tilt, _max_tilt);
-    _command.z = 0.0;
+    _command.z = _u.psi;
 
     _command_publisher.publish(_command);
   }

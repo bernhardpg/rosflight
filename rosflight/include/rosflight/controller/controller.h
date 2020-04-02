@@ -63,7 +63,7 @@ namespace controller
       void computeControl();
       void publishCommand();
 
-      double saturate(double v); // TODO move somewhere else
+      double saturate(double v, double min, double max); // TODO move somewhere else
 
       state_t _x; // TODO change to estimate
       state_t _x_ref;
@@ -74,6 +74,7 @@ namespace controller
       double _g;
       double _eq_thrust;
       double _max_thrust;
+      double _max_tilt;
   };
 }
 

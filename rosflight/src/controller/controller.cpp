@@ -2,7 +2,9 @@
 
 namespace controller {
   Controller::Controller(ros::NodeHandle *nh) : _nh(*nh) {
+    // References
     _x_ref.pd = -1.0; // TODO ref height
+    _max_tilt = 0.35; // TODO just picked
     
     // Model parameters
     _m = 2.0; // kg
@@ -59,7 +61,7 @@ namespace controller {
         ); 
   
 
-    //ROS_INFO("%f %f %f", _x.phi, _x.theta, _x.psi);
+    ROS_INFO("%f %f %f", _x.phi, _x.theta, _x.psi);
     
     computeControl();
     publishCommand();
@@ -88,15 +90,17 @@ namespace controller {
         / ((_g - _u.d) * (cos(_x.psi) + tan(_x.psi) * sin(_x.psi)))
         );
 
+    // TODO something off when yaw is changed
+
     ROS_INFO("un: %f, ue: %f, u_phi: %f, u_theta: %f",
         _u.n, _u.e, _u.phi, _u.theta);
 
   }
 
-  double Controller::saturate(double v)
+  double Controller::saturate(double v, double min, double max)
   {
-    v = v > 1.0 ? 1.0 : (
-        v < 0.0 ? 0.0 : v
+    v = v > max ? max : (
+        v < min ? min : v
         );
 
     return v;
@@ -109,9 +113,9 @@ namespace controller {
     _command.ignore = rosflight_msgs::Command::IGNORE_NONE;
     _command.mode = rosflight_msgs::Command::MODE_ROLL_PITCH_YAWRATE_THROTTLE;
     // F from 0 to 1, scale by max thrust
-    _command.F = saturate(_u.F / _max_thrust);
-    _command.x = _u.phi;
-    _command.y = _u.theta;
+    _command.F = saturate(_u.F / _max_thrust, 0.0, 1.0);
+    _command.x = saturate(_u.phi, -_max_tilt, _max_tilt);
+    _command.y = saturate(_u.theta, -_max_tilt, _max_tilt);
     _command.z = 0.0;
 
     _command_publisher.publish(_command);

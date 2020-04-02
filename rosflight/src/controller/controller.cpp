@@ -15,8 +15,8 @@ namespace controller {
     _k.pn = 2.0;
     _k.pe = 2.0;
     _k.pd = 14;
-    _k.dn = 3.5;
-    _k.de = 3.5;
+    _k.dn = 4.0;
+    _k.de = 4.0;
     _k.dd = 7.0;
     _k.ppsi = 1.0;
 
@@ -80,6 +80,16 @@ namespace controller {
 
     // CONTROL INPUTS
     _u.F = _m * ((_g - _u.d) / (cos(_x.phi) * cos(_x.theta))); // N
+    _u.phi = atan2(
+        ((cos(_x.theta) * _u.e )
+        + (sin(_x.theta) * sin(_x.psi) * (_g - _u.d))),
+        (_g - _u.d) * cos(_x.psi)
+        ); // TODO this gets singular
+    _u.theta = atan2( 
+        -(cos(_x.psi) * _u.n + sin(_x.psi) * _u.e),
+        (_g - _u.d)
+        );
+    /*
     _u.phi = atan(
         (cos(_x.theta) * _u.e ) / ((_g - _u.d) * cos(_x.psi))
         + sin(_x.theta) * tan(_x.psi)
@@ -88,6 +98,7 @@ namespace controller {
         -(_u.n + tan(_x.psi) * _u.e)
         / ((_g - _u.d) * (cos(_x.psi) + tan(_x.psi) * sin(_x.psi)))
         );
+        */
 
     // TODO yaw problem: oscillates like crazy for psi = pi/2
     // singularity maybe?

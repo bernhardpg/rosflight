@@ -27,10 +27,9 @@ namespace controller
 
  typedef struct
   {
-    // Actual inputs to attitude controller
-    double x;
-    double y;
-    double z;
+    double phi;
+    double theta;
+    double psi;
     double F;
 
     // Virtual inputs
@@ -71,6 +70,8 @@ namespace controller
       input_t _u;
       gain_t _k;
 
+      double _m;
+      double _g;
       double _eq_thrust;
       double _max_thrust;
   };

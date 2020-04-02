@@ -4,14 +4,18 @@ namespace controller {
   Controller::Controller(ros::NodeHandle *nh) : _nh(*nh) {
     _x_ref.pd = -1.0; // TODO ref height
     
+    // Model parameters
+    _m = 2.0; // kg
+    _g = 9.8; // m/s**2
+
     // P gains
-    _k.pn = 0.1;
-    _k.pe = 0.1;
+    _k.pn = 2.0;
+    _k.pe = 2.0;
     _k.pd = 14;
 
     // D gains
-    _k.dn = 0.1;
-    _k.de = 0.1;
+    _k.dn = 3.5;
+    _k.de = 3.5;
     _k.dd = 7.0;
     _eq_thrust = 0.542;
     _max_thrust = 14.961 * 4; // From gazebo sim, 4 rotors
@@ -22,7 +26,7 @@ namespace controller {
     _command_publisher = _nh.advertise<rosflight_msgs::Command>(
         "/command", 1000);
 
-    ROS_INFO("Control1ler node init complete");
+    ROS_INFO("Controller node init complete");
   }
 
   void Controller::odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
@@ -63,24 +67,30 @@ namespace controller {
 
   void Controller::computeControl()
   {
-    // Altitude PD control + eq feedforward
-    double e_pd = _x.pd - _x_ref.pd;
-    _u.d = - _k.pd * e_pd - _k.dd * _x.vd; // + _eq_thrust
-
+    // OUTER CONTROL LOOP
     // Position PD control
     // TODO replace with error, so far only stabilizes the origin
     _u.n = -_k.pn * _x.pn - _k.dn * _x.vn;
     _u.e = -_k.pe * _x.pe - _k.de * _x.ve;
 
-    // Control inputs
-    double m = 2.0;
-    double g = 9.8;
-    
-    _u.F = m * ((g - _u.d) / (cos(_x.phi) * cos(_x.theta))); // N
-    
-    // Attitude
-    ROS_INFO("e_pd: %f, ud: %f, _x.phi: %f, x.theta: %f",
-        e_pd, _u.d, _x.phi, _x.theta);
+    // Altitude PD control
+    double e_pd = _x.pd - _x_ref.pd;
+    _u.d = - _k.pd * e_pd - _k.dd * _x.vd; // + _eq_thrust
+
+    // CONTROL INPUTS
+    _u.F = _m * ((_g - _u.d) / (cos(_x.phi) * cos(_x.theta))); // N
+    _u.phi = atan(
+        (cos(_x.theta) * _u.e ) / ((_g - _u.d) * cos(_x.psi))
+        + sin(_x.theta) * tan(_x.psi)
+        );
+    _u.theta = atan(
+        -(_u.n + tan(_x.psi) * _u.e)
+        / ((_g - _u.d) * (cos(_x.psi) + tan(_x.psi) * sin(_x.psi)))
+        );
+
+    ROS_INFO("un: %f, ue: %f, u_phi: %f, u_theta: %f",
+        _u.n, _u.e, _u.phi, _u.theta);
+
   }
 
   double Controller::saturate(double v)
@@ -100,9 +110,9 @@ namespace controller {
     _command.mode = rosflight_msgs::Command::MODE_ROLL_PITCH_YAWRATE_THROTTLE;
     // F from 0 to 1, scale by max thrust
     _command.F = saturate(_u.F / _max_thrust);
-    _command.x = _u.x;
-    _command.y = _u.y;
-    _command.z = _u.z;
+    _command.x = _u.phi;
+    _command.y = _u.theta;
+    _command.z = 0.0;
 
     _command_publisher.publish(_command);
   }

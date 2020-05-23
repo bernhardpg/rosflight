@@ -33,7 +33,6 @@
  * \file rosflight_io.cpp
  * \author Daniel Koch <daniel.koch@byu.edu>
  */
-
 #include <rosflight/mavrosflight/mavlink_serial.h>
 #include <rosflight/mavrosflight/mavlink_udp.h>
 #include <rosflight/mavrosflight/serial_exception.h>

@@ -22,12 +22,14 @@ find_package(catkin REQUIRED COMPONENTS
   rosflight_firmware
   rosflight_msgs
 )
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.3.9 REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp gazebo_plugins gazebo_ros geometry_msgs rosflight_firmware rosflight_msgs
-  DEPENDS EIGEN3 GAZEBO
+  DEPENDS
+        #EIGEN3
+        GAZEBO
 )
 
 include_directories(include)

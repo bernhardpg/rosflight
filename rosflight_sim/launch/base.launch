@@ -20,7 +20,7 @@
 
 
   <!-- Start Simulator -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  <include args="-g" file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="paused" value="$(arg paused)"/>
     <arg name="gui" value="$(arg gui)"/>
     <arg name="verbose" value="$(arg verbose)"/>

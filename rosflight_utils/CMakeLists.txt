@@ -26,7 +26,7 @@ include_directories(${catkin_INCLUDE_DIRS})
 add_library(rosflight_utils
   src/simple_pid.cpp
   src/turbomath.cpp
-)
+        include/rosflight_utils/QuaternionMath.h include/rosflight_utils/Quaternion.h)
 add_dependencies(${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rosflight_utils ${catkin_LIBRARIES})
 

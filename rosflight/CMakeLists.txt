@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rosflight)
 
+set(EIGEN3_INCLUDE_DIRS "/usr/local/include/eigen3")
+
 set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_CXX_FLAGS "-std=c++0x")
@@ -18,7 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
 )
 find_package(Boost REQUIRED COMPONENTS system thread)
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.3.9 REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
@@ -47,11 +49,17 @@ catkin_package(
 ## Build ##
 ###########
 
+message("catkin = " ${catkin_INCLUDE_DIRS})
+message("boost = " ${Boost_INCLUDE_DIRS})
+message("Eigen = " ${EIGEN3_INCLUDE_DIRS})
+message("YAML = " ${YAML_CPP_INCLUDEDIR})
+
+
 include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
+#  ${EIGEN3_INCLUDE_DIRS}
   ${YAML_CPP_INCLUDEDIR}
 )
 

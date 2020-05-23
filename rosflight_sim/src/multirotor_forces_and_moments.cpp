@@ -65,6 +65,7 @@ Multirotor::Multirotor(ros::NodeHandle *nh)
   /* Load Rotor Configuration */
   motors_.resize(num_rotors_);
 
+
   force_allocation_matrix_.resize(4,num_rotors_);
   torque_allocation_matrix_.resize(4,num_rotors_);
   for(int i = 0; i < num_rotors_; i++)

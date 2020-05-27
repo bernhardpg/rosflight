@@ -6,4 +6,4 @@
 	url = https://github.com/larserikfagernaes/-mavlink_c_library_rosflight.git
 [submodule "rosflight_firmware/firmware"]
 	path = rosflight_firmware/firmware
-	url = https://github.com/bernhardpg/firmware
+	url = https://github.com/norobotics/firmware.git
